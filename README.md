@@ -11,7 +11,7 @@ Base Ethernaut contracts like [`Ethernaut`](https://github.com/OpenZeppelin/ethe
 | 0. Hello Ethernaut | ✅     |
 | 1. Fallback        | ✅     |
 | 2. Fallout         | ✅     |
-| 3. CoinFlip        |        |
+| 3. CoinFlip        | ✅     |
 | 4. Telephone       |        |
 | 5. Token           |        |
 | 6. Delegation      |        |

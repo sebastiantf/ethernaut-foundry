@@ -6,6 +6,7 @@ import "../src/Ethernaut.sol";
 import "../src/metrics/Statistics.sol";
 import "../src/levels/CoinFlipFactory.sol";
 import "../src/levels/CoinFlip.sol";
+import "../src/levels/CoinFlipHack.sol";
 
 contract CoinFlipTest is Test {
     Ethernaut ethernaut;
@@ -58,6 +59,25 @@ contract CoinFlipTest is Test {
         CoinFlip instance = CoinFlip(payable(instanceAddress));
 
         /* Level Hack */
+        // 0. Check current consecutiveWins
+        uint256 consecutiveWins = instance.consecutiveWins();
+        emit log_named_uint("consecutiveWins", consecutiveWins);
+        assertEq(consecutiveWins, 0);
+
+        // 1. Call coinFlipHack.flip() 10 times
+        CoinFlipHack coinFlipHack = new CoinFlipHack(instanceAddress);
+        for (uint8 i = 1; i <= 10; i++) {
+            emit log_named_uint("block.number", block.number);
+
+            coinFlipHack.flip();
+
+            // mine new block
+            vm.roll(block.number + 1);
+
+            consecutiveWins = instance.consecutiveWins();
+            assertEq(consecutiveWins, i);
+        }
+        emit log_named_uint("consecutiveWins", consecutiveWins);
 
         /* Level Submit */
         // Start recording logs to capture level completed log

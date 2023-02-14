@@ -69,7 +69,8 @@ contract CoinFlipTest is Test {
         for (uint8 i = 1; i <= 10; i++) {
             emit log_named_uint("block.number", block.number);
 
-            coinFlipHack.flip();
+            bool flip = coinFlipHack.flip();
+            assertTrue(flip);
 
             // mine new block
             vm.roll(block.number + 1);

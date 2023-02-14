@@ -46,9 +46,11 @@ contract InstanceTest is Test {
             keccak256("LevelInstanceCreatedLog(address,address,address)")
             // event LevelInstanceCreatedLog(address indexed player, address indexed instance, address indexed level);
         );
+        Vm.Log memory levelInstanceCreatedLog = entries[0];
+
         // Cast bytes32 log arg into address
         address instanceAddress = address(
-            uint160(uint256(entries[0].topics[2]))
+            uint160(uint256(levelInstanceCreatedLog.topics[2]))
         );
         emit log_named_address("instanceAddress", instanceAddress);
 
@@ -73,14 +75,16 @@ contract InstanceTest is Test {
             keccak256("LevelCompletedLog(address,address,address)")
             // event LevelCompletedLog(address indexed player, address indexed instance, address indexed level);
         );
+        Vm.Log memory levelCompletedLog = submitLogsEntries[1];
+
         // Cast bytes32 log arg into address
         address playerAddress_ = address(
-            uint160(uint256(submitLogsEntries[1].topics[1]))
+            uint160(uint256(levelCompletedLog.topics[1]))
         );
         emit log_named_address("playerAddress_", playerAddress_);
 
         address instanceAddress_ = address(
-            uint160(uint256(submitLogsEntries[1].topics[2]))
+            uint160(uint256(levelCompletedLog.topics[2]))
         );
         emit log_named_address("instanceAddress_", instanceAddress_);
 

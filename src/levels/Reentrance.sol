@@ -24,7 +24,10 @@ contract Reentrance {
       if(result) {
         _amount;
       }
-      balances[msg.sender] -= _amount;
+      // using unchecked to disable under/overflow checks
+      unchecked {
+        balances[msg.sender] -= _amount;
+      }
     }
   }
 

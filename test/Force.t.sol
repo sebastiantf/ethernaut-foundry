@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.13;
+pragma solidity ^0.8.0;
 
 import "forge-std/Test.sol";
 import "../src/Ethernaut.sol";
 import "../src/metrics/Statistics.sol";
 import "../src/levels/ForceFactory.sol";
 import "../src/levels/Force.sol";
+import "../src/levels/ForceHack.sol";
 
 contract ForceTest is Test {
     Ethernaut ethernaut;
@@ -58,6 +59,15 @@ contract ForceTest is Test {
         Force instance = Force(payable(instanceAddress));
 
         /* Level Hack */
+        uint256 balance = address(instance).balance;
+        emit log_named_uint("balance", balance);
+
+        // 1. Deploy ForceHack while passing msg.value. It should selfdestruct and transfer the ether balance to Force
+        vm.deal(eoa, 1 ether);
+        new ForceHack{value: 1 ether}(instanceAddress);
+
+        balance = address(instance).balance;
+        emit log_named_uint("balance", balance);
 
         /* Level Submit */
         // Start recording logs to capture level completed log

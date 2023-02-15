@@ -7,6 +7,7 @@ import "../src/Ethernaut.sol";
 import "../src/metrics/Statistics.sol";
 import "../src/levels/ElevatorFactory.sol";
 import "../src/levels/Elevator.sol";
+import "../src/levels/ElevatorHack.sol";
 
 contract ElevatorTest is Test {
     using stdStorage for StdStorage;
@@ -62,6 +63,16 @@ contract ElevatorTest is Test {
         Elevator instance = Elevator(payable(instanceAddress));
 
         /* Level Hack */
+        bool top = instance.top();
+        console.log("top", top);
+        assertFalse(top);
+
+        ElevatorHack elevatorHack = new ElevatorHack();
+        elevatorHack.attack(instanceAddress);
+
+        top = instance.top();
+        console.log("top", top);
+        assertTrue(top);
 
         /* Level Submit */
         // Start recording logs to capture level completed log

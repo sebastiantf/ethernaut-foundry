@@ -61,6 +61,23 @@ contract PrivacyTest is Test {
         Privacy instance = Privacy(payable(instanceAddress));
 
         /* Level Hack */
+        bool locked = instance.locked();
+        console.log("locked", locked);
+        assertTrue(locked);
+
+        // 1. Load data from slot 5
+        bytes32 data2 = vm.load(instanceAddress, bytes32(uint256(5)));
+        emit log_named_bytes32("data2", data2);
+        
+        // 2. Convert to bytes16
+        bytes16 key = bytes16(data2);
+        emit log_named_bytes32("key", key);
+
+        instance.unlock(key);
+
+        locked = instance.locked();
+        console.log("locked", locked);
+        assertFalse(locked);
 
         /* Level Submit */
         // Start recording logs to capture level completed log

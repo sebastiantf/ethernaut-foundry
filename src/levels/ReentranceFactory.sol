@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
+// pragma solidity ^0.6.0; // original
+pragma solidity ^0.8.0; // changed to compile
 
-pragma solidity ^0.6.0;
-
-import './base/Level-06.sol';
+import './base/Level.sol';
 import './Reentrance.sol';
 
 contract ReentranceFactory is Level {
@@ -14,7 +14,8 @@ contract ReentranceFactory is Level {
     require(msg.value >= insertCoin);
     Reentrance instance = new Reentrance();
     require(address(this).balance >= insertCoin);
-    address(instance).transfer(insertCoin);
+    // address(instance).transfer(insertCoin); // original
+    payable(instance).transfer(insertCoin); // changed to compile
     return address(instance);
   }
 

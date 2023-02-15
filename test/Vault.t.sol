@@ -30,9 +30,9 @@ contract VaultTest is Test {
     function testVaultHack() public {
         /* Level Setup */
         // Deploy level factory: VaultFactory
-        VaultFactory forceFactory = new VaultFactory();
+        VaultFactory vaultFactory = new VaultFactory();
         // Register level on Ethernaut
-        ethernaut.registerLevel(forceFactory);
+        ethernaut.registerLevel(vaultFactory);
 
         // Set caller to custom address
         vm.startPrank(eoa);
@@ -40,7 +40,7 @@ contract VaultTest is Test {
         // Start recording logs to capture new level instance address
         vm.recordLogs();
         // Create new level instance via Ethernaut
-        ethernaut.createLevelInstance(forceFactory);
+        ethernaut.createLevelInstance(vaultFactory);
 
         // Parse emitted logs
         Vm.Log[] memory entries = vm.getRecordedLogs();

@@ -16,9 +16,9 @@ Base Ethernaut contracts like [`Ethernaut`](https://github.com/OpenZeppelin/ethe
 | 5. Token           | ✅     |
 | 6. Delegation      | ✅     |
 | 7. Force           | ✅     |
-| 8. Vault           |        |
-| 9. King            |        |
-| 10. Re             |        |
+| 8. Vault           | ✅     |
+| 9. King            | ✅     |
+| 10. Reentrance     | ✅     |
 | 11. Elevator       |        |
 | 12. Privacy        |        |
 | 13. GatekeeperOne  |        |

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.6.0;
+// pragma solidity ^0.6.0; // original
+pragma solidity ^0.8.0; // changed to compile
 
 contract Token {
 
@@ -11,9 +12,12 @@ contract Token {
   }
 
   function transfer(address _to, uint _value) public returns (bool) {
-    require(balances[msg.sender] - _value >= 0);
-    balances[msg.sender] -= _value;
-    balances[_to] += _value;
+    // using unchecked to disable under/overflow checks
+    unchecked {
+      require(balances[msg.sender] - _value >= 0);
+      balances[msg.sender] -= _value;
+      balances[_to] += _value;
+    }
     return true;
   }
 

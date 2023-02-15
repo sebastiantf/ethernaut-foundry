@@ -12,10 +12,10 @@ Base Ethernaut contracts like [`Ethernaut`](https://github.com/OpenZeppelin/ethe
 | 1. Fallback        | ✅     |
 | 2. Fallout         | ✅     |
 | 3. CoinFlip        | ✅     |
-| 4. Telephone       |        |
-| 5. Token           |        |
-| 6. Delegation      |        |
-| 7. Force           |        |
+| 4. Telephone       | ✅     |
+| 5. Token           | ✅     |
+| 6. Delegation      | ✅     |
+| 7. Force           | ✅     |
 | 8. Vault           |        |
 | 9. King            |        |
 | 10. Re             |        |

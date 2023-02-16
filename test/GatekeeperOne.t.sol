@@ -118,9 +118,39 @@ contract GatekeeperOneTest is Test {
           --------------------------
           0x00 00 00 11 00 00 60 45  = _gateKey same as before
         */
-        bytes8 _gateKey = bytes8(
-            uint64((uint160(eoa) << 144) >> 144) | 0x0000001100000000
-        );
+        // bytes8 _gateKey = bytes8(uint64((uint160(eoa) << 144) >> 144) | 0x0000001100000000);
+
+        /* 
+          Using assembly:
+          All values are dealt as 32-byte words in assembly
+          So the address will only 32 bytes in total
+          uint160(eoa) = 0x000000000000000000000000d8dA6BF26964aF9D7eEd9e03E53415D37aA96045
+          We want clear all but 2 lower order bytes. So:
+          32 - 2 = 30 bytes = 30 * 8 = 240 bits : left shift 30 bytes = left shift 240 bits
+          shift back 30 bytes. thus all upper bits except 2 lower order bytes are cleared
+          shl(240, sload(eoa.slot)) = 0x6045000000000000000000000000000000000000000000000000000000000000
+          We need bytes8 in the end. We now have 2 bytes
+          8 - 2 = 6 bytes = 48 bits
+          We could convert the result to 8 bytes by right shift only by 6 bytes = 48 bits
+          shr(48, shl(240, sload(eoa.slot))) = 0x0000000000006045000000000000000000000000000000000000000000000000
+          Now we mask
+          0x11 will be in 32 bytes with leading zeroes = 0x0000000000000000000000000000000000000000000000000000000000000011
+          we need that in the 4th byte: 32 - 4 = 28 bytes = 224 bits
+          so left shift 0x11 to 224 bits will place 0x11 in the right place
+          shl(224, 0x11) = 0x0000001100000000000000000000000000000000000000000000000000000000
+          0x0000000000006045000000000000000000000000000000000000000000000000 OR
+          0x0000001100000000000000000000000000000000000000000000000000000000
+          --------------------------------------------------------------------
+          0x0000001100006045000000000000000000000000000000000000000000000000
+
+          Since _gateKey is in bytes8, it trailing zeroes will be truncated to make it 8 bytes:
+          0x00 00 00 11 00 00 60 45  = _gateKey same as before
+        */
+        bytes8 _gateKey;
+        assembly {
+            _gateKey := shr(48, shl(240, sload(eoa.slot)))
+            _gateKey := or(shl(224, 0x11), _gateKey)
+        }
 
         // Assert all gate checks from GatekeeperOne's gateThree
         assertTrue(uint32(uint64(_gateKey)) == uint16(uint64(_gateKey)));

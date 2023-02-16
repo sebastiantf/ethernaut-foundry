@@ -98,8 +98,29 @@ contract GatekeeperOneTest is Test {
           uint16(uint160(eoa)) = 0x60 45
           uint32(uint64(_gateKey)) == uint16(uint160(eoa)) is this true 
         */
-        bytes8 _gateKey = bytes8(uint64(uint32(uint16(uint160(eoa))))) |
-            bytes8(bytes4(0x00000011));
+        // bytes8 _gateKey = bytes8(uint64(uint32(uint16(uint160(eoa))))) | bytes8(bytes4(0x00000011));
+
+        /* 
+          Using bitwise shift operators:
+          Compiler will deal with the correct no. of bits depending on type
+          Since it is an address / uint160 it will only have 20 bytes in total
+          We want clear all but 2 lower order bytes. So:
+          20 - 2 = 18 bytes = 18 * 8 = 144 bits : left shift 18 bytes = left shift 144 bits
+          shift back 18 bytes. thus all upper bits except 2 lower order bytes are cleared
+          We can now OR it with the mask to change the first 4 bytes
+          uint160(eoa) = 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045
+          uint160(eoa) << 144 = 0x6045000000000000000000000000000000000000 : left shift to clear upper bits
+          (uint160(eoa) << 144) >> 144 = 0x000000000000000000000000000000006045 : right shift to bring it back
+          uint64((uint160(eoa) << 144) >> 144) = 0x0000000000006045 : convert to 8 bytes : truncates higher order bytes to make it 8 bytes
+          uint64((uint160(eoa) << 144) >> 144) | 0x0000001100000000 : OR with the mask
+          0x00 00 00 00 00 00 60 45 OR
+          0x00 00 00 11 00 00 00 00
+          --------------------------
+          0x00 00 00 11 00 00 60 45  = _gateKey same as before
+        */
+        bytes8 _gateKey = bytes8(
+            uint64((uint160(eoa) << 144) >> 144) | 0x0000001100000000
+        );
 
         // Assert all gate checks from GatekeeperOne's gateThree
         assertTrue(uint32(uint64(_gateKey)) == uint16(uint64(_gateKey)));

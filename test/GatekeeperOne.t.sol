@@ -107,7 +107,12 @@ contract GatekeeperOneTest is Test {
           We want clear all but 2 lower order bytes. So:
           20 - 2 = 18 bytes = 18 * 8 = 144 bits : left shift 18 bytes = left shift 144 bits
           shift back 18 bytes. thus all upper bits except 2 lower order bytes are cleared
+          We have to shift back 18 bytes, because since we need bytes8, we first need uint64
+          uint64 will truncate the higher order bits and only take the lower order bits
+          so we need the 2 bytes to be in the lower bits
           We can now OR it with the mask to change the first 4 bytes
+          mask should be 0x11 00 00 00 00
+          so shift left 0x11 by 4 bytes = 8 * 4 = 32 bytes
           uint160(eoa) = 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045
           uint160(eoa) << 144 = 0x6045000000000000000000000000000000000000 : left shift to clear upper bits
           (uint160(eoa) << 144) >> 144 = 0x000000000000000000000000000000006045 : right shift to bring it back
@@ -118,7 +123,9 @@ contract GatekeeperOneTest is Test {
           --------------------------
           0x00 00 00 11 00 00 60 45  = _gateKey same as before
         */
-        // bytes8 _gateKey = bytes8(uint64((uint160(eoa) << 144) >> 144) | 0x0000001100000000);
+        // bytes8 _gateKey = bytes8(
+        //     uint64(((uint160(eoa) << 144) >> 144)) | (0x11 << 32)
+        // );
 
         /* 
           Using assembly:
@@ -152,6 +159,7 @@ contract GatekeeperOneTest is Test {
             _gateKey := or(shl(224, 0x11), _gateKey)
         }
 
+        console.logBytes8(_gateKey);
         // Assert all gate checks from GatekeeperOne's gateThree
         assertTrue(uint32(uint64(_gateKey)) == uint16(uint64(_gateKey)));
         assertTrue(uint32(uint64(_gateKey)) != uint64(_gateKey));

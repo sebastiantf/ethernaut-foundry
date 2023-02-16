@@ -36,7 +36,8 @@ contract GatekeeperOneTest is Test {
         ethernaut.registerLevel(gatekeeperOneFactory);
 
         // Set caller to custom address
-        vm.startPrank(eoa);
+        // set tx.origin to custom address too, since its being checked
+        vm.startPrank(eoa, eoa);
         vm.deal(eoa, 1 ether);
 
         // Start recording logs to capture new level instance address
@@ -63,6 +64,25 @@ contract GatekeeperOneTest is Test {
         GatekeeperOne instance = GatekeeperOne(payable(instanceAddress));
 
         /* Level Hack */
+        address entrant = instance.entrant();
+        emit log_named_address("entrant", entrant);
+        assertEq(entrant, address(0));
+
+        // Solution comments in GatekeeperOne.sol
+        bytes8 _gateKey = bytes8(uint64(uint32(uint16(uint160(eoa))))) |
+            bytes8(bytes4(0x00000011));
+        // Assert all gate checks from GatekeeperOne's gateThree
+        assertTrue(uint32(uint64(_gateKey)) == uint16(uint64(_gateKey)));
+        assertTrue(uint32(uint64(_gateKey)) != uint64(_gateKey));
+        assertTrue(uint32(uint64(_gateKey)) == uint16(uint160(eoa)));
+
+        GatekeeperOneHack gatekeeperOneHack = new GatekeeperOneHack(
+            instanceAddress
+        );
+
+        entrant = instance.entrant();
+        emit log_named_address("entrant", entrant);
+        assertEq(entrant, address(eoa));
 
         /* Level Submit */
         // Start recording logs to capture level completed log

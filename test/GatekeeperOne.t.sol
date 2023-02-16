@@ -69,6 +69,33 @@ contract GatekeeperOneTest is Test {
         assertEq(entrant, address(0));
 
         // Solution comments in GatekeeperOne.sol
+        // Read docs about conversion: https://docs.soliditylang.org/en/latest/types.html#conversions-between-elementary-types
+        // tx.origin will be eoa since we're pranking it
+        // uint160(eoa) = 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045
+        // uint16(uin160(eoa)) = 0x6045
+        // uint32(uint16(uint160(eoa))) = 0x00 00 60 45  // pad 2 zero bytes to left to make it 32 bits = 4 bytes
+        // uint64(uint32(uint16(uint160(eoa)))) = 0x00 00 00 00 00 00 60 45 // pad 4 more zero bytes to left to make it 64 bits = 8 bytes
+        // bytes8(uint64(uint32(uint16(uint160(eoa))))) = same number
+        // bytes4(0x00000011) = 0x00 00 00 11
+        // bytes8(bytes4(0x00000011)) = 0x00 00 00 11 00 00 00 00  // pad 4 zero bytes to the right to make it 8 bytes
+        // OR the two:
+        // 0x00 00 00 00 00 00 60 45 OR
+        // 0x00 00 00 11 00 00 00 00
+        // -----------------------------
+        // 0x00 00 00 11 00 00 60 45  = _gateKey
+
+        // uint64(_gateKey) = same number
+        // uint32(uint64(_gateKey)) = 0x00 00 60 45 // remove 4 bytes from left to make it 4 bytes
+
+        // uint16(uint64(_gateKey)) = 0x60 45 // remove 6 bytes from left to make it 2 bytes
+        // uint32(uint64(_gateKey)) == uint16(uint64(_gateKey)) is thus true
+
+        // uint64(_gateKey) = same number
+        // uint32(uint64(_gateKey)) != uint64(_gateKey) is thus true
+
+        // uint16(uint160(eoa)) = 0x60 45
+        // uint32(uint64(_gateKey)) == uint16(uint160(eoa)) is this true
+
         bytes8 _gateKey = bytes8(uint64(uint32(uint16(uint160(eoa))))) |
             bytes8(bytes4(0x00000011));
         // Assert all gate checks from GatekeeperOne's gateThree

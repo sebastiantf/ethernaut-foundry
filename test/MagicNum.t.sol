@@ -110,11 +110,10 @@ contract MagicNumTest is Test {
         /* Bytecode */
         // 0xinitCode_602a60005260206000f3
         // 0x600a600c600039600a6000f3_602a60005260206000f3
-        bytes
-            memory creationCode = hex"600a600c600039600a6000f3_602a60005260206000f3";
+        /* bytes memory creationCode = hex"600a600c600039600a6000f3_602a60005260206000f3"; */
         // this calldata can be used in a raw transaction to deploy the contractCode
         // We can also use the create() opcode to perform the contract creation:
-        address solverAddr;
+        /* address solverAddr;
         assembly {
             // creationCode stored as bytes, which is a dynamic array
             // The length of a dynamic array is stored at the first slot of the array and followed by the array elements.
@@ -131,7 +130,7 @@ contract MagicNumTest is Test {
             if iszero(eq(extcodesize(solverAddr), 10)) {
                 revert(0, 0)
             }
-        }
+        } */
 
         /* Alternative creation code */
         // initCode only has to return the runtime bytecode
@@ -144,6 +143,18 @@ contract MagicNumTest is Test {
         // RETURN : Return 10 bytes from memory starting at offset 22 : f3
         /* Bytecode */
         // 0x69602a60005260206000f3600052600a6016f3
+        bytes memory creationCode = hex"69602a60005260206000f3600052600a6016f3";
+        address solverAddr;
+        assembly {
+            solverAddr := create(
+                0,
+                add(creationCode, 0x20),
+                mload(creationCode)
+            )
+            if iszero(eq(extcodesize(solverAddr), 10)) {
+                revert(0, 0)
+            }
+        }
 
         instance.setSolver(solverAddr);
 

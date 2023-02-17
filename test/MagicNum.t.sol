@@ -84,6 +84,31 @@ contract MagicNumTest is Test {
         bytes memory bytecode = hex"602a60005260206000f3";
         vm.etch(address(0x4337), bytecode);
         assertEq(address(0x4337).code, bytecode);
+        
+        // In order to create the contract on a live network instead of using vm.etch(),
+        // we need to prepare a calldata comprised of initCode + contractCode
+        // initCode has to be bytecode that returns the contractCode that gets stored in an address's code storage
+        // so the initCode should actually copy the contractCode bytes from the calldata into memory and return it
+        /* Mnemonic */
+        // PUSH1 0x0a : Push 0x0a to stack : third argument `size` for CODECOPY : 60 0a
+        // PUSH1 0x0c : Push 0x0c to stack : second argument `offset` for CODECOPY : 60 0c
+        // PUSH1 0 : Push 0 to stack : first argument `destOffset` for CODECOPY : 60 00
+        // CODECOPY : Copy 10 (0x0a) bytes from calldata starting from offset 0x0c and store it in memory at offset 0 : CODECOPY(destOffset, offset, size) : 0x0c can be figured out in the end after laying out all the opcodes: 39
+        // PUSH1 0x0a : Push 10 1 byte to stack : second argument `value` to RETURN : 60 0a
+        // PUSH1 0 : Push 0 1 byte to stack : first argument `offset` to RETURN : 60 00
+        // RETURN : Return 10 bytes from memory starting at offset 0 : f3
+        // contractCode below:
+        // PUSH1 0x2a
+        // PUSH1 0
+        // MSTORE
+        // PUSH1 32
+        // PUSH1 0
+        // RETURN
+        /* Bytecode */
+        // 0xinitCode_602a60005260206000f3
+        // 0x600a600c600039600a6000f3_602a60005260206000f3
+        // bytes memory calldata = hex"600a600c600039600a6000f3_602a60005260206000f3";
+        // this calldata can be used in a raw transaction to deploy the contractCode 
 
         instance.setSolver(address(0x4337));
 

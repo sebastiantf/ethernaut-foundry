@@ -66,6 +66,31 @@ contract MagicNumTest is Test {
         MagicNum instance = MagicNum(payable(instanceAddress));
 
         /* Level Hack */
+        // Easy to develop bytecode and mnemonics in evm.codes playground
+        // The bytecode doesn't necessarily have to handle any specific calls
+        // It will be executed for whatever / however it is being called
+        // So we just need to return the number
+        /* Mnemonic */
+        // 42 = 0x2a
+        // PUSH1 0x2a : Push 0x2a 1 byte to stack : second argument `value` to MSTORE : 60 2a
+        // PUSH1 0 : Push 0 1 byte to stack : first argument `offset` to MSTORE : 60 00
+        // MSTORE : Store 0x2a at memory offset 0 : MSTORE(offset, value) : 52
+        // PUSH1 32 : Push 32 1 byte to stack : second argument `value` to RETURN : 60 20
+        // PUSH1 0 : Push 0 1 byte to stack : first argument `offset` to RETURN : 60 00
+        // RETURN : Return 32 bytes from memory starting at offset 0 : f3
+        /* Bytecode */
+        // 0x602a60005260206000f3
+        // Hexadecimal literals are prefixed with the keyword hex and are enclosed in double or single-quotes: https://docs.soliditylang.org/en/v0.8.17/types.html#hexadecimal-literals
+        bytes memory bytecode = hex"602a60005260206000f3";
+        vm.etch(address(0x4337), bytecode);
+        assertEq(address(0x4337).code, bytecode);
+
+        instance.setSolver(address(0x4337));
+
+        Solver solver = Solver(instance.solver());
+        assertEq(address(solver), address(0x4337));
+        uint256 result = uint256(solver.whatIsTheMeaningOfLife());
+        assertEq(result, 42);
 
         /* Level Submit */
         // Start recording logs to capture level completed log

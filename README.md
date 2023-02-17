@@ -22,9 +22,9 @@ Base Ethernaut contracts like [`Ethernaut`](https://github.com/OpenZeppelin/ethe
 | 11. Elevator       | ✅     |
 | 12. Privacy        | ✅     |
 | 13. GatekeeperOne  | ✅     |
-| 14. GatekeeperTwo  |        |
-| 15. NaughtCoin     |        |
-| 16. Preservation   |        |
+| 14. GatekeeperTwo  | ✅     |
+| 15. NaughtCoin     | ✅     |
+| 16. Preservation   | ✅     |
 | 17. Recovery       |        |
 | 18. Magic          |        |
 | 19. AlienCodex     |        |

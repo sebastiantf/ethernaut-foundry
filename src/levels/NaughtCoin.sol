@@ -22,6 +22,8 @@ import 'openzeppelin-contracts-08/token/ERC20/ERC20.sol';
     emit Transfer(address(0), player, INITIAL_SUPPLY);
   }
   
+  // Only transfer is overridden
+  // transferFrom() still works the same
   function transfer(address _to, uint256 _value) override public lockTokens returns(bool) {
     super.transfer(_to, _value);
   }

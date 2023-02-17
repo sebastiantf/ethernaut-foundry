@@ -75,7 +75,7 @@ contract MagicNumTest is Test {
         // PUSH1 0x2a : Push 0x2a 1 byte to stack : second argument `value` to MSTORE : 60 2a
         // PUSH1 0 : Push 0 1 byte to stack : first argument `offset` to MSTORE : 60 00
         // MSTORE : Store 0x2a at memory offset 0 : MSTORE(offset, value) : 52
-        // PUSH1 32 : Push 32 1 byte to stack : second argument `value` to RETURN : 60 20
+        // PUSH1 32 : Push 32 1 byte to stack : second argument `size` to RETURN : 60 20
         // PUSH1 0 : Push 0 1 byte to stack : first argument `offset` to RETURN : 60 00
         // RETURN : Return 32 bytes from memory starting at offset 0 : f3
         /* Bytecode */
@@ -97,7 +97,7 @@ contract MagicNumTest is Test {
         /*  NOTE: Apparently, a contract creation txn has an empty calldata, but has a special `init` field where the contract creation code is available. Hence CALLDATACOPY would return empty while CODECOPY returns the code from `init`
         Hence we cannot use CALLDATACOPY and need to use CODECOPY
         Read more: https://betterprogramming.pub/solidity-tutorial-all-about-calldata-aebbe998a5fc#ce8d */
-        // PUSH1 0x0a : Push 10 1 byte to stack : second argument `value` to RETURN : 60 0a
+        // PUSH1 0x0a : Push 10 1 byte to stack : second argument `size` to RETURN : 60 0a
         // PUSH1 0 : Push 0 1 byte to stack : first argument `offset` to RETURN : 60 00
         // RETURN : Return 10 bytes from memory starting at offset 0 : f3
         // contractCode below:
@@ -112,6 +112,18 @@ contract MagicNumTest is Test {
         // 0x600a600c600039600a6000f3_602a60005260206000f3
         // bytes memory calldata = hex"600a600c600039600a6000f3_602a60005260206000f3";
         // this calldata can be used in a raw transaction to deploy the contractCode
+        
+        /* Alternative creation code */
+        // initCode only has to return the runtime bytecode
+        // So there is an alternative contract creation bytecode
+        // PUSH10 602a60005260206000f3 : Push all 10 bytes of the runtime bytecode to stack : second argument `value` to MSTORE : 69 602a60005260206000f3
+        // PUSH1 0 : Push 0 1 byte to stack : first argument `offset` to MSTORE : 60 00
+        // MSTORE : Store full runtime bytecode at memory offset 0 : MSTORE(offset, value) : 52
+        // PUSH1 0x0a : Push 10 1 byte to stack : second argument `size` to RETURN : 60 0a
+        // PUSH1 0x16 : Push 22 1 byte to stack : first argument `offset` to RETURN : 60 16
+        // RETURN : Return 10 bytes from memory starting at offset 22 : f3
+        /* Bytecode */
+        // 0x69602a60005260206000f3600052600a6016f3
 
         instance.setSolver(address(0x4337));
 

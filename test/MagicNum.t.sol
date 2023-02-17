@@ -81,9 +81,9 @@ contract MagicNumTest is Test {
         /* Bytecode */
         // 0x602a60005260206000f3
         // Hexadecimal literals are prefixed with the keyword hex and are enclosed in double or single-quotes: https://docs.soliditylang.org/en/v0.8.17/types.html#hexadecimal-literals
-        bytes memory bytecode = hex"602a60005260206000f3";
-        vm.etch(address(0x4337), bytecode);
-        assertEq(address(0x4337).code, bytecode);
+        // bytes memory bytecode = hex"602a60005260206000f3";
+        // vm.etch(address(0x4337), bytecode);
+        // assertEq(address(0x4337).code, bytecode);
 
         // In order to create the contract on a live network instead of using vm.etch(),
         // we need to prepare a calldata comprised of initCode + contractCode
@@ -110,9 +110,29 @@ contract MagicNumTest is Test {
         /* Bytecode */
         // 0xinitCode_602a60005260206000f3
         // 0x600a600c600039600a6000f3_602a60005260206000f3
-        // bytes memory calldata = hex"600a600c600039600a6000f3_602a60005260206000f3";
+        bytes
+            memory creationCode = hex"600a600c600039600a6000f3_602a60005260206000f3";
         // this calldata can be used in a raw transaction to deploy the contractCode
-        
+        // We can also use the create() opcode to perform the contract creation:
+        address solverAddr;
+        assembly {
+            // creationCode stored as bytes, which is a dynamic array
+            // The length of a dynamic array is stored at the first slot of the array and followed by the array elements.
+            // Read more: https://docs.soliditylang.org/en/v0.8.10/internals/layout_in_memory.html#layout-in-memory
+            // create(msg.value, offset, size)
+            // offset would be the second slot of the creationCode bytes array where the code actually starts
+            // size would be the length of the creationCode bytes array which is stored at the first slot of the array
+            // which can be loaded by mload(creationCode)
+            solverAddr := create(
+                0,
+                add(creationCode, 0x20),
+                mload(creationCode)
+            )
+            if iszero(eq(extcodesize(solverAddr), 10)) {
+                revert(0, 0)
+            }
+        }
+
         /* Alternative creation code */
         // initCode only has to return the runtime bytecode
         // So there is an alternative contract creation bytecode
@@ -125,10 +145,10 @@ contract MagicNumTest is Test {
         /* Bytecode */
         // 0x69602a60005260206000f3600052600a6016f3
 
-        instance.setSolver(address(0x4337));
+        instance.setSolver(solverAddr);
 
         Solver solver = Solver(instance.solver());
-        assertEq(address(solver), address(0x4337));
+        assertEq(address(solver), solverAddr);
         uint256 result = uint256(solver.whatIsTheMeaningOfLife());
         assertEq(result, 42);
 

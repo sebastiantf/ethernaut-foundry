@@ -25,8 +25,8 @@ Base Ethernaut contracts like [`Ethernaut`](https://github.com/OpenZeppelin/ethe
 | 14. GatekeeperTwo  | ✅     |
 | 15. NaughtCoin     | ✅     |
 | 16. Preservation   | ✅     |
-| 17. Recovery       |        |
-| 18. Magic          |        |
+| 17. Recovery       | ✅     |
+| 18. MagicNum       | ✅     |
 | 19. AlienCodex     |        |
 | 20. Denial         |        |
 | 21. Shop           |        |

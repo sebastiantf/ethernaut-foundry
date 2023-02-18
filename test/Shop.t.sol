@@ -7,6 +7,7 @@ import "../src/Ethernaut.sol";
 import "../src/metrics/Statistics.sol";
 import "../src/levels/ShopFactory.sol";
 import "../src/levels/Shop.sol";
+import "../src/levels/ShopHack.sol";
 
 contract ShopTest is Test {
     using stdStorage for StdStorage;
@@ -62,6 +63,24 @@ contract ShopTest is Test {
         Shop instance = Shop(payable(instanceAddress));
 
         /* Level Hack */
+        bool isSold = instance.isSold();
+        console.log("isSold", isSold);
+        assertFalse(isSold);
+
+        uint256 price = instance.price();
+        emit log_named_uint("price", price);
+        assertEq(price, 100);
+
+        ShopHack shopHack = new ShopHack();
+        shopHack.attack(address(instance));
+
+        isSold = instance.isSold();
+        console.log("isSold", isSold);
+        assertTrue(isSold);
+
+        price = instance.price();
+        emit log_named_uint("price", price);
+        assertEq(price, 0);
 
         /* Level Submit */
         // Start recording logs to capture level completed log

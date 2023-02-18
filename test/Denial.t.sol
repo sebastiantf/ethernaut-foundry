@@ -71,11 +71,11 @@ contract DenialTest is Test {
         instance.setWithdrawPartner(address(denialHack));
 
         // Gotcha: Usage with low-level calls : https://book.getfoundry.sh/cheatcodes/expect-revert?highlight=expectrevert#description
-        vm.expectRevert();
+        // vm.expectRevert();
         (bool status, ) = address(instance).call{gas: 1000000}(
             abi.encodeWithSignature("withdraw()")
         );
-        assertTrue(status, "expectRevert: call did not revert");
+        assertFalse(status, "expectRevert: call did not revert");
 
         /* Level Submit */
         // Start recording logs to capture level completed log

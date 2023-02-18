@@ -70,6 +70,11 @@ contract DenialTest is Test {
         DenialHack denialHack = new DenialHack();
         instance.setWithdrawPartner(address(denialHack));
 
+        vm.expectRevert();
+        address(instance).call{gas: 1000000}(
+            abi.encodeWithSignature("withdraw()")
+        );
+
         /* Level Submit */
         // Start recording logs to capture level completed log
         vm.recordLogs();

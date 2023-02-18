@@ -7,6 +7,7 @@ import "../src/Ethernaut.sol";
 import "../src/metrics/Statistics.sol";
 import "../src/levels/DenialFactory.sol";
 import "../src/levels/Denial.sol";
+import "../src/levels/DenialHack.sol";
 
 interface ISimpleToken {
     function destroy(address payable _to) external;
@@ -66,6 +67,8 @@ contract DenialTest is Test {
         Denial instance = Denial(payable(instanceAddress));
 
         /* Level Hack */
+        DenialHack denialHack = new DenialHack();
+        instance.setWithdrawPartner(address(denialHack));
 
         /* Level Submit */
         // Start recording logs to capture level completed log

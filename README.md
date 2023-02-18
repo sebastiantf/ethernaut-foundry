@@ -28,8 +28,8 @@ Base Ethernaut contracts like [`Ethernaut`](https://github.com/OpenZeppelin/ethe
 | 17. Recovery       | ✅     |
 | 18. MagicNum       | ✅     |
 | 19. AlienCodex     |        |
-| 20. Denial         |        |
-| 21. Shop           |        |
+| 20. Denial         | ✅     |
+| 21. Shop           | ✅     |
 | 22. Dex            |        |
 | 23. Dex            |        |
 | 24. PuzzleWallet   |        |

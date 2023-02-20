@@ -28,10 +28,21 @@ contract MotorbikeTest is Test {
     function testMotorbikeHack() public {
         /* Level Setup */
         // Deploy level factory: MotorbikeFactory
-        // TODO: deploy directly
+        bytes memory bytecode = vm.getCode(
+            "MotorbikeFactory.sol:MotorbikeFactory"
+        );
+
+        address motorbikeFactoryAddress;
+        assembly {
+            motorbikeFactoryAddress := create(
+                0,
+                add(bytecode, 0x20),
+                mload(bytecode)
+            )
+        }
 
         // Register level on Ethernaut
-        ethernaut.registerLevel(); /* MotorbikeFactory */
+        ethernaut.registerLevel(Level(motorbikeFactoryAddress));
 
         // Set caller to custom address
         vm.startPrank(eoa);
@@ -40,25 +51,24 @@ contract MotorbikeTest is Test {
         // Start recording logs to capture new level instance address
         vm.recordLogs();
         // Create new level instance via Ethernaut
-        ethernaut.createLevelInstance{value: 0.001 ether}(); /* MotorbikeFactory */
+        ethernaut.createLevelInstance{value: 0.001 ether}(
+            Level(motorbikeFactoryAddress)
+        );
 
         // Parse emitted logs
         Vm.Log[] memory entries = vm.getRecordedLogs();
         assertEq(
-            entries[11].topics[0],
+            entries[0].topics[0],
             keccak256("LevelInstanceCreatedLog(address,address,address)")
             // event LevelInstanceCreatedLog(address indexed player, address indexed instance, address indexed level);
         );
-        Vm.Log memory levelMotorbikeCreatedLog = entries[11];
+        Vm.Log memory levelMotorbikeCreatedLog = entries[0];
 
         // Cast bytes32 log arg into address
         address instanceAddress = address(
             uint160(uint256(levelMotorbikeCreatedLog.topics[2]))
         );
         emit log_named_address("instanceAddress", instanceAddress);
-
-        // Instantiate level instance
-        Motorbike instance = Motorbike(payable(instanceAddress));
 
         /* Level Hack */
 

@@ -63,6 +63,16 @@ contract GoodSamaritanTest is Test {
         GoodSamaritan instance = GoodSamaritan(payable(instanceAddress));
 
         /* Level Hack */
+        uint256 balance = instance.coin().balances(address(instance.wallet()));
+        emit log_named_uint("balance", balance);
+        assertTrue(balance > 0);
+
+        GoodSamaritanHack goodSamaritanHack = new GoodSamaritanHack();
+        goodSamaritanHack.attack(instanceAddress);
+
+        balance = instance.coin().balances(address(instance.wallet()));
+        emit log_named_uint("balance", balance);
+        assertTrue(balance == 0);
 
         /* Level Submit */
         // Start recording logs to capture level completed log

@@ -78,7 +78,7 @@ contract DexTest is Test {
         // | 0                | 20               | 110              | 90               | 20 B | 24 A       |
         // | 24               | 0                | 86               | 110              | 24 A | 30 B       |
         // | 0                | 30               | 110              | 80               | 30 B | 41 A       |
-        // | 41               | 0                | 69               | 110              | 41 B | 65 B       |
+        // | 41               | 0                | 69               | 110              | 41 A | 65 B       |
         // | 0                | 65               | 110              | 45               | 65 B | 158 A      |
         //
         // At this point we have 65 token B but pool only has 45 token B. Swapping 65 token B requires 158 token B, which the pool doesn't have. So if we swap just 45 token B, we can drain 110 token A from the pool

@@ -93,9 +93,6 @@ contract DexTwoTest is Test {
         m.transfer(address(instance), 10);
         m.approve(address(instance), type(uint256).max);
 
-        address from = address(m);
-        address to = instance.token1();
-
         instance.swap(
             address(m),
             instance.token1(),

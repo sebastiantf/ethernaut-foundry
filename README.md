@@ -6,34 +6,35 @@ Base Ethernaut contracts like [`Ethernaut`](https://github.com/OpenZeppelin/ethe
 
 ## Levels
 
-| Level              | Status |
-| ------------------ | ------ |
-| 0. Hello Ethernaut | ✅     |
-| 1. Fallback        | ✅     |
-| 2. Fallout         | ✅     |
-| 3. CoinFlip        | ✅     |
-| 4. Telephone       | ✅     |
-| 5. Token           | ✅     |
-| 6. Delegation      | ✅     |
-| 7. Force           | ✅     |
-| 8. Vault           | ✅     |
-| 9. King            | ✅     |
-| 10. Reentrance     | ✅     |
-| 11. Elevator       | ✅     |
-| 12. Privacy        | ✅     |
-| 13. GatekeeperOne  | ✅     |
-| 14. GatekeeperTwo  | ✅     |
-| 15. NaughtCoin     | ✅     |
-| 16. Preservation   | ✅     |
-| 17. Recovery       | ✅     |
-| 18. MagicNum       | ✅     |
-| 19. AlienCodex     |        |
-| 20. Denial         | ✅     |
-| 21. Shop           | ✅     |
-| 22. Dex            | ✅     |
-| 23. DexTwo         | ✅     |
-| 24. PuzzleWallet   |        |
-| 25. Motorbike      | ✅     |
+| Level                | Status |
+| -------------------- | ------ |
+| 0. Hello Ethernaut   | ✅     |
+| 1. Fallback          | ✅     |
+| 2. Fallout           | ✅     |
+| 3. CoinFlip          | ✅     |
+| 4. Telephone         | ✅     |
+| 5. Token             | ✅     |
+| 6. Delegation        | ✅     |
+| 7. Force             | ✅     |
+| 8. Vault             | ✅     |
+| 9. King              | ✅     |
+| 10. Reentrance       | ✅     |
+| 11. Elevator         | ✅     |
+| 12. Privacy          | ✅     |
+| 13. GatekeeperOne    | ✅     |
+| 14. GatekeeperTwo    | ✅     |
+| 15. NaughtCoin       | ✅     |
+| 16. Preservation     | ✅     |
+| 17. Recovery         | ✅     |
+| 18. MagicNum         | ✅     |
+| 19. AlienCodex       |        |
+| 20. Denial           | ✅     |
+| 21. Shop             | ✅     |
+| 22. Dex              | ✅     |
+| 23. DexTwo           | ✅     |
+| 24. PuzzleWallet     |        |
+| 25. Motorbike        | ✅     |
+| 26. DoubleEntryPoint | ✅     |
 
 ## References
 

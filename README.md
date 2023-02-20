@@ -31,7 +31,7 @@ Base Ethernaut contracts like [`Ethernaut`](https://github.com/OpenZeppelin/ethe
 | 20. Denial         | ✅     |
 | 21. Shop           | ✅     |
 | 22. Dex            | ✅     |
-| 23. DexTwo         |        |
+| 23. DexTwo         | ✅     |
 | 24. PuzzleWallet   |        |
 | 25. Motorbike      | ✅     |
 

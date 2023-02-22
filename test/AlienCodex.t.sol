@@ -7,6 +7,7 @@ import "../src/Ethernaut.sol";
 import "../src/metrics/Statistics.sol";
 import "openzeppelin-contracts/utils/Address.sol";
 import "../src/metrics/Statistics.sol";
+import "../src/levels/AlienCodexHack.sol";
 
 contract AlienCodexTest is Test {
     using stdStorage for StdStorage;
@@ -72,7 +73,26 @@ contract AlienCodexTest is Test {
         );
         emit log_named_address("instanceAddress", instanceAddress);
 
+        Ownable instance = Ownable(instanceAddress);
+
         /* Level Hack */
+        address owner = instance.owner();
+        emit log_named_address("owner", owner);
+        assertEq(owner, address(alienCodexFactoryAddress));
+        address ownerFromSlot = address(
+            uint160(uint256(vm.load(instanceAddress, 0)))
+        );
+        emit log_named_address("ownerFromSlot", ownerFromSlot);
+        assertEq(ownerFromSlot, address(alienCodexFactoryAddress));
+
+        AlienCodexHack alienCodexHack = new AlienCodexHack(instanceAddress);
+        
+        owner = instance.owner();
+        emit log_named_address("owner", owner);
+        assertEq(owner, address(eoa));
+        ownerFromSlot = address(uint160(uint256(vm.load(instanceAddress, 0))));
+        emit log_named_address("ownerFromSlot", ownerFromSlot);
+        assertEq(ownerFromSlot, address(eoa));
 
         /* Level Submit */
         // Start recording logs to capture level completed log

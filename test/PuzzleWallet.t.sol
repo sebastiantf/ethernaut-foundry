@@ -7,6 +7,7 @@ import "../src/Ethernaut.sol";
 import "../src/metrics/Statistics.sol";
 import "../src/levels/PuzzleWalletFactory.sol";
 import "../src/levels/PuzzleWallet.sol";
+import "../src/levels/PuzzleWalletHack.sol";
 
 contract PuzzleWalletTest is Test {
     using stdStorage for StdStorage;
@@ -63,6 +64,9 @@ contract PuzzleWalletTest is Test {
         PuzzleWallet instance = PuzzleWallet(payable(instanceAddress));
 
         /* Level Hack */
+        PuzzleWalletHack puzzleWalletHack = new PuzzleWalletHack{value: 0.001 ether}(
+            instanceAddress
+        );
 
         /* Level Submit */
         // Start recording logs to capture level completed log

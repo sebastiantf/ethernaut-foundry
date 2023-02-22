@@ -6,8 +6,8 @@ import "../helpers/UpgradeableProxy-08.sol";
 
 
 contract PuzzleProxy is UpgradeableProxy {
-    address public pendingAdmin;
-    address public admin;
+    address public pendingAdmin; // same slot as PuzzleWallet.owner
+    address public admin; // same slot as PuzzleWallet.maxBalance
 
     constructor(
         address _admin,
@@ -40,8 +40,8 @@ contract PuzzleProxy is UpgradeableProxy {
 }
 
 contract PuzzleWallet {
-    address public owner;
-    uint256 public maxBalance;
+    address public owner; // same slot as PuzzleProxy.pendingAdmin
+    uint256 public maxBalance; // same slot as PuzzleProxy.admin
     mapping(address => bool) public whitelisted;
     mapping(address => uint256) public balances;
 

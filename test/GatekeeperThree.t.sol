@@ -66,6 +66,16 @@ contract GatekeeperThreeTest is Test {
         GatekeeperThree instance = GatekeeperThree(payable(instanceAddress));
 
         /* Level Hack */
+        address entrant = instance.entrant();
+        emit log_named_address("entrant", entrant);
+        assertEq(entrant, address(0));
+
+        GatekeeperThreeHack gatekeeperThreeHack = new GatekeeperThreeHack();
+        gatekeeperThreeHack.attack{value: 0.002 ether}(instanceAddress);
+
+        entrant = instance.entrant();
+        emit log_named_address("entrant", entrant);
+        assertEq(entrant, address(eoa));
 
         /* Level Submit */
         // Start recording logs to capture level completed log

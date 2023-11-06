@@ -6,6 +6,7 @@ import "../src/Ethernaut.sol";
 import "../src/metrics/Statistics.sol";
 import "../src/levels/SwitchFactory.sol";
 import "../src/levels/Switch.sol";
+import "../src/levels/SwitchHack.sol";
 
 contract SwitchTest is Test {
     using stdStorage for StdStorage;
@@ -61,6 +62,7 @@ contract SwitchTest is Test {
         Switch instance = Switch(payable(instanceAddress));
 
         /* Level Hack */
+        new SwitchHack(instance);
 
         /* Level Submit */
         // Start recording logs to capture level completed log

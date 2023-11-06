@@ -62,7 +62,7 @@ contract SwitchTest is Test {
         Switch instance = Switch(payable(instanceAddress));
 
         /* Level Hack */
-        new SwitchHack(instance);
+        new SwitchHack(address(instance));
 
         /* Level Submit */
         // Start recording logs to capture level completed log

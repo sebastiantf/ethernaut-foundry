@@ -37,6 +37,7 @@ Base Ethernaut contracts like [`Ethernaut`](https://github.com/OpenZeppelin/ethe
 | 26. DoubleEntryPoint | ✅     |
 | 27. GoodSamaritan    | ✅     |
 | 28. GatekeeperThree  | ✅     |
+| 29. Switch           | ✅     |
 
 ## References
 
